@@ -6,14 +6,12 @@
 
 
 
+
 class Table
 {
-    //Player players[2];
-
 
     Pack* pack;
     int tableCards[5];
-    //QMessageBox msg;
     QString rangMaxT;
     QString combT;
     QString combwithMaxrang;
@@ -27,8 +25,11 @@ public:
     int m_player;
     void SetCardTable(int arg, int x);
     int* getCardTable();
-  //  QString getArrCardTable();
-    int* AutPlyer();
+    void SetCardTableVector(int arg);
+        QVector<int> tableCardsVector;
+        void delCard(int arg,int i);
+
+        double percent;
 };
 
 #endif // TABLE_H

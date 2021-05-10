@@ -1,5 +1,5 @@
 #include "player.h"
-//#include "card.h"
+#include "algorithm"
 
 Player::Player()
 {
@@ -8,7 +8,6 @@ Player::Player()
     rangName=new QString[5];
     value=new int[7];
     valueR=new int[7];
-    //tables=new Table;
     suit=new int[7];
 }
 void Player::SetPlayer(QString cardName, QString playerName)
@@ -31,20 +30,8 @@ QString Player::combPlayer(int* tableCards, int* playerCards)
         valueR[i] = playerCards[i - 5];
     }
 
-    //проверка на одинаковые карты
-    for(int x=0;x<a;x++)
-    {
-        for(int y=0;y<a;y++)
-        {
-            if(x!=y && valueR[y]==valueR[x] && valueR[y]!=-1 )
-            {
-                msg.setWindowTitle("Внимание");
-                msg.setText("Найдены одниковые карты");
-                msg.exec();
-                return "Ошибка: одинаковые карты";
-            }
-        }
-    }
+
+
 
     //получаем ранг карт и масть со стола
     for(int x=0;x<a;x++)
@@ -64,6 +51,21 @@ QString Player::combPlayer(int* tableCards, int* playerCards)
         }
     }
 
+    //проверка на одинаковые карты
+
+//    for(int x=0;x<a;x++)
+//    {
+//        for(int y=0;y<a;y++)
+//        {
+//            if(x!=y && value[y]==value[x] && value[y]!=-1 && suit[y]==suit[x] )
+//            {
+//                msg.setWindowTitle("Внимание");
+//                msg.setText("Найдены одниковые карты");
+//                msg.exec();
+
+//            }
+//        }
+//    }
     //сортируем
     for(int x=0;x<a;x++)
         for(int y=0;y<a-x;y++)
@@ -120,7 +122,7 @@ QString Player::combPlayer(int* tableCards, int* playerCards)
                                 if(value[z]==value[i]&&y!=z && z!=x && i!=x &&  i!=y && value[i]!=-1 && z!=i)
                                 {
                                     combT="Фул хаус";
-                                    combaT=2;
+                                    combaT=6;
                                     rangMaxT=pack->getCard(value[i],w);
                                 }
                             }
@@ -205,7 +207,7 @@ QString Player::combPlayer(int* tableCards, int* playerCards)
             if (flesh>=4)
             {
                 combT="Стрит флеш";
-                combaT=5;
+                combaT=8;
                 rangMaxT=pack->getCard(value[a-1],w);
             }
             if (flesh>=4 && value[a-1]==12)
@@ -243,8 +245,10 @@ QString Player::combPlayer(int* tableCards, int* playerCards)
     return combwithMaxrang;
 }
 
-void Player::comb_2(int y, int x)
-{
+int Player::returnCombaT(){
+    return combaT;
 
 }
+
+
 

@@ -1,4 +1,11 @@
 #include "pack.h"
+#include "QDebug"
+#include "algorithm"
+#include "player.h"
+#include "random"
+#include "mainwindow.h"
+
+using namespace std;
 
 Pack::Pack()
 {
@@ -14,13 +21,7 @@ Pack::Pack()
             cards[i++].SetCard(x,y);
         }
     }
-    allCardOnTable=new int[52];
-    closeCards=new int[52];
-    openCards= new int[52];
-    valueAut=new int[52];
-    suitAut=new int[52];
-    valueClose=new int[52];
-    suitClose=new int[52];
+
 
 }
 QString Pack::getCard(int y, int &z)
@@ -35,7 +36,7 @@ int Pack::getValue(int &y) //возвращает ранг карты по но�
 
 int Pack::getSuit(int &y) //возвращает масть карты по номеру
 {
-        return cards[y].getCardSuit();
+    return cards[y].getCardSuit();
 }
 
 QString Pack::getNameCard(QString &arg)
@@ -44,106 +45,146 @@ QString Pack::getNameCard(QString &arg)
     int w=1;//полное имя
     for(int y=0;y<52;y++)
     {
-       if(cards[y].getName(w)==arg)
-       return cards[y].getName(z);
+        if(cards[y].getName(w)==arg)
+            return cards[y].getName(z);
     }
 }
 
-QString Pack::allCardsOnTableFunc(int *allCardsTable, int* CardsPlyer, int* CardsTable)
+QString Pack::allCardsOnTableFunc(QVector<int> allCardsTable, QVector<int> CardsPlyer, QVector<int> CardsTable, QVector<int> CardsPlyer2)
 {
     //находим длину массива
-    int len=1;
-    do
-    {
-        len++;
-    }while(0<=allCardOnTable[len+1]<52);
+    int len=allCardsTable.size();
 
-    //помещаем карты в массив открытых карт
-    for(int x=0;x<len;x++)
-        openCards[x]=allCardOnTable[x];
+    openCardsVector=allCardsTable;
 
     //получаем массив закрытых карт
     for(int x=0;x<52;x++)
-        for(int y=0;y<len;y++)
-        {
-        if(cards[x].getid()!=openCards[y])
-        closeCards[x]=cards[x].getid();
-        }
+        closeCardsVector.push_back(x);
+    for(int x=0; x<len;x++)
+        closeCardsVector.erase(remove(closeCardsVector.begin(), closeCardsVector.end(),openCardsVector[x]),closeCardsVector.end());
 
     //получаем ранг карт и масть закрытых карт
-    for(int x=0;x<52;x++)
+    int len1=closeCardsVector.size();
+    for(int x=0;x<len1;x++)
     {
         for(int r=0;r<52;r++)
         {
-            if(r==closeCards[x])
+            if(r==closeCardsVector[x])
             {
-                valueClose[x]=getValue(r);
-                suitClose[x]=getSuit(r);
-            }
-            if(closeCards[x]==-1)
-            {
-                valueClose[x]=-1;
-                suitClose[x]=-1;
+                valueCloseVector.push_back(getValue(r));
+                suitCloseVector.push_back(getSuit(r));
             }
         }
     }
 
     //получаем ранг и масть открытых карт
-    for(int x=0;x<52;x++)
+    int lenn=openCardsVector.size();
+    for(int x=0;x<lenn;x++)
     {
         for(int r=0;r<52;r++)
         {
-            if(r==openCards[x])
+            if(r==openCardsVector[x])
             {
-                valueOpen[x]=getValue(r);
-                suitOpen[x]=getSuit(r);
-            }
-            if(openCards[x]==-1)
-            {
-                valueOpen[x]=-1;
-                suitOpen[x]=-1;
+                valueOpenVector.push_back(getValue(r));
+                suitOpenVector.push_back(getSuit(r));
             }
         }
     }
-    //ищем все ауты игрока до флопа
-    score=0;
-    for(int x=0;x<52;x++)
-        for(int y=0;y<52; y++)
-        {
-            if(valueOpen[x]==valueClose[y]||suitOpen[x]==suitClose[y])
-            {
-                if(valueOpen[x]==valueClose[y])
-                {
-                    valueAut[x]=valueClose[y];
-                    suitAut[x]=suitClose[y];
-                    score++;
 
-                }
-                if(suitOpen[x]==suitClose[y])
-                {
-                    valueAut[x]=valueClose[y];
-                    suitAut[x]=suitClose[y];
-                    score++;
-                }
-            }
+    vector<int>combinatoin;
 
-        }
+    Player *player=new Player();
+    int CardPlayer1[2];
+    CardPlayer1[0]=CardsPlyer[0];
+    CardPlayer1[1]=CardsPlyer[1];
+    int CardPlayer2[2];
+    CardPlayer2[0]=CardsPlyer2[0];
+    CardPlayer2[1]=CardsPlyer2[1];
 
-    cardsAut=new Card[score];
-    int i=0;
-    for (int x=0; x<4; x++)
+    int combM[2];
+    double value=0;
+    double score=0;
+
+
+    vector<int>valuePlayers;
+    for(int x=0;x<2;x++)
     {
-        for (int y=0; y<13; y++)
-        {
-
-            cardsAut[i++].SetCard(suitAut[x],valueAut[y]);
-            NameAut+=getCardAut(x,y)+" ";
-        }
+        valuePlayers.push_back(getValue(CardsPlyer[x]));
+    }
+    for(int x=0;x<2;x++)
+    {
+        valuePlayers.push_back(getValue(CardsPlyer2[x]));
     }
 
-    //устанавливаю имена карт аутов
+    //получаем рандомную комбинацию карт на столе много раз
+    qApp->processEvents();
+    for (int x=0; x<set; x++){
+        int combinationMass[5];
+        for(int y=0; y<5;y++){
+            for(int x=0;x<5;x++)
+                std::random_shuffle(closeCardsVector.begin(), closeCardsVector.end());
 
-    return NameAut;
+            if (CardsTable.size()<3)
+                combinationMass[y]=closeCardsVector[y+25];
+
+
+            if (CardsTable.size()==3)
+            {
+                combinationMass[0]=CardsTable[0];
+                combinationMass[1]=CardsTable[1];
+                combinationMass[2]=CardsTable[2];
+                if (y==3)
+                    combinationMass[y]=closeCardsVector[y+25];
+            }
+            if (CardsTable.size()==4)
+            {
+                combinationMass[0]=CardsTable[0];
+                combinationMass[1]=CardsTable[1];
+                combinationMass[2]=CardsTable[2];
+                combinationMass[3]=CardsTable[3];
+                if (y==4)
+                    combinationMass[y]=closeCardsVector[y+25];
+            }
+            if (CardsTable.size()==5)
+            {
+                combinationMass[0]=CardsTable[0];
+                combinationMass[1]=CardsTable[1];
+                combinationMass[2]=CardsTable[2];
+                combinationMass[3]=CardsTable[3];
+                combinationMass[4]=CardsTable[4];
+
+            }
+        }
+        //получаем комбинацию у одного игрока
+        player->combPlayer(combinationMass, CardPlayer1);
+        combM[0]=player->returnCombaT();
+        //получаем комбинацию у другого игрока
+        player->combPlayer(combinationMass, CardPlayer2);
+        combM[1]=player->returnCombaT();
+
+
+        //определяем выиграла ли комбинация одного у другого
+        if (combM[0]>combM[1]){
+            value++;
+        }
+        if(combM[0]==combM[1]){
+            if(valuePlayers[0]>valuePlayers[2])
+                value++;
+            if(valuePlayers[0]==valuePlayers[2])
+                if(valuePlayers[1]>valuePlayers[3])
+                    value++;
+            // else score++;
+        }
+
+
+    }
+    //draw=(set/score);
+    persent=((value-score)/(set))*100;
+    //небольшая корректировка значения
+
+    QString Qpersent;
+    Qpersent.setNum(persent);
+    return Qpersent;
 }
 
 
@@ -159,7 +200,7 @@ int Pack::getValueAut(int &y) //возвращает ранг карты по н
 
 int Pack::getSuitAut(int &y) //возвращает масть карты по номеру
 {
-        return cardsAut[y].getCardSuit();
+    return cardsAut[y].getCardSuit();
 }
 QString Pack::getNameCardAut(QString &arg)
 {
@@ -167,8 +208,8 @@ QString Pack::getNameCardAut(QString &arg)
     int w=1;//полное имя
     for(int y=0;y<52;y++)
     {
-       if(cardsAut[y].getName(w)==arg)
-       return cardsAut[y].getName(z);
+        if(cardsAut[y].getName(w)==arg)
+            return cardsAut[y].getName(z);
     }
 }
 

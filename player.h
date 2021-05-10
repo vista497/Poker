@@ -3,14 +3,11 @@
 #include "card.h"
 #include "pack.h"
 #include "QDebug"
-//#include "table.h"
-//#include "mainwindow.h"
 #include <QMessageBox>
+
 
 class Player
 {
-   // Table* tables;
-    //MainWindow mainwindows;
     Card cards[2];
     Pack* pack;
     QString PlayerName;
@@ -30,12 +27,16 @@ class Player
     int strit;
     bool error;
 
+
+
 public:
     Player();
 
     void SetPlayer(QString cardName, QString playerName);
     QString combPlayer(int* tableCards, int* playerCards);
-    void comb_2(int y, int x);
+   int returnCombaT();
+
+
 
 };
 

@@ -51,5 +51,4 @@ void QComboBoxModel::SetTextBox(QString *newValues)
     this->beginInsertRows(QModelIndex(), 1, idx);
         this->str = newValues;
     endInsertRows();
-//    ui_main->textEdit->setText(arg1);
 }

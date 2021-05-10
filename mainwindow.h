@@ -1,19 +1,18 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 #include <QMainWindow>
-#include <QLayout>
-#include <QLineEdit>
-#include <QListView>
+
 #include <QPushButton>
-//#include "card.h"
 #include "table.h"
 #include "pack.h"
-#include <QString>
+
 #include <QComboBox>
 #include "qcomboboxmodel.h"
-#include <QLabel>
+
 #include <QDebug>
 #include "player.h"
+#include <QMessageBox>
+#include "form.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -32,6 +31,10 @@ class MainWindow : public QMainWindow
         int i=0;
         int j=0;
         int h[5];
+        int q1=0;
+        int q2=0;
+        int q3=0;
+        int q4=0;
 
         QList<QPair<int,QString>> *values;
         QComboBoxModel *model;
@@ -42,12 +45,14 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     QString combobox1;
+    QMessageBox msg;
+    Form f;
+
+
 signals:
    int combobox();
 
 private slots:
-
-    Card on_comboBox_activated(const QString &arg1);
 
     void on_pushButton_clicked();
 
@@ -72,6 +77,9 @@ private slots:
 
 
     void on_comboBox_9_currentIndexChanged(int index);
+
+
+    void on_radioButton_clicked(bool checked);
 
 private:
     Ui::MainWindow *ui_main;
